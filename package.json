@@ -5,8 +5,11 @@
     "preview": "webpack serve --config webpack.config.js --mode production"
   },
   "dependencies": {
+    "@react-three/drei": "^10.0.5",
+    "@react-three/fiber": "^9.1.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "three": "^0.174.0"
   },
   "devDependencies": {
     "@types/react": "^19.0.8",

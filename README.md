@@ -5,7 +5,7 @@ This is a standardized template for creating Module Federation blocks in the MEX
 ## Features
 
 - 🔧 **Webpack 5** with Module Federation
-- ⚛️ **React 18** with TypeScript
+- ⚛️ **React 19** with TypeScript
 - 🎨 **CSS Loader** support
 - 🔥 **Hot Module Replacement** for development
 - 📦 **Independent Dependencies** - no sharing to avoid conflicts
