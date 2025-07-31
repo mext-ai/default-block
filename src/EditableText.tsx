@@ -171,7 +171,7 @@ const EditableText: React.FC<EditableTextProps> = ({ id, children, filePath = 's
           fontSize: 'inherit',
           fontFamily: 'inherit',
           fontWeight: 'inherit',
-          color: 'inherit',
+          color: 'black',
           outline: 'none',
           minWidth: '100px'
         }}
