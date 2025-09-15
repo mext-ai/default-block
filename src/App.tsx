@@ -1,7 +1,7 @@
 // In your App.tsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Block from "./block";
+import Block from "./home/block";
 import './styles.css';
 
 interface MountAPI {
