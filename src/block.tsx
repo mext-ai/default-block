@@ -13,7 +13,7 @@ interface BlockProps {
   cameraPosition?: [number, number, number];
 }
 
-function CubeCascadeModel({ modelPath = "https://content.mext.app/uploads/2374c9be-41b4-4fe6-acb0-7c7f1110fcc7.glb", playAnimations = true, ...props }) {
+function CubeCascadeModel({ modelPath = "https://content.mext.app/block/quantum_cube.glb", playAnimations = true, ...props }) {
   const group = useRef<THREE.Group>(null);
   const { scene, animations } = useGLTF(modelPath);
   const { actions, names } = useAnimations(animations, group);
