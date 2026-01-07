@@ -2,7 +2,7 @@ body {
   margin: 0px;
 }
 
-#root {
+#root, #app {
   height: 100vh;
 }
 
