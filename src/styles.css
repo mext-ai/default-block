@@ -1,8 +1,0 @@
-body {
-  margin: 0px;
-}
-
-/* Hidden class for soft delete functionality */
-.hidden {
-  display: none !important;
-}
