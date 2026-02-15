@@ -35,7 +35,7 @@ import type {
   InteractionType,
   QuestionType,
   QuestionEventType,
-} from '../types/blockAnalytics';
+} from '../../../website/src/types/blockAnalytics';
 
 export class BlockTracker {
   private config: Required<BlockTrackerConfig>;
