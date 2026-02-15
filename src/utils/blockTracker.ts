@@ -107,6 +107,7 @@ export class BlockTracker {
       data,
     };
     
+    
     this.state.interactions.push(event);
     this.state.totalInteractions++;
     
