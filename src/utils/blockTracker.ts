@@ -35,7 +35,7 @@ import type {
   InteractionType,
   QuestionType,
   QuestionEventType,
-} from '../../../website/src/types/blockAnalytics';
+} from './blockAnalytics';
 
 export class BlockTracker {
   private config: Required<BlockTrackerConfig>;
@@ -107,7 +107,7 @@ export class BlockTracker {
       data,
     };
     
-    
+
     this.state.interactions.push(event);
     this.state.totalInteractions++;
     
@@ -457,6 +457,7 @@ export class BlockTracker {
       maxScore,
       timeSpent,
       data,
+      timestamp: Date.now()
     };
     
     this.sendEvent(legacyEvent);
