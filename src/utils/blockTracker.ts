@@ -93,7 +93,7 @@ import type {
       elementType?: string,
       duration?: number
     ): void {
-      if (!this.config.trackInteractions || this.isCompleted) return;
+      if (!this.config.trackInteractions) return;
       
       const event: InteractionEvent = {
         type: 'BLOCK_INTERACTION',
