@@ -15,8 +15,8 @@
  * tracker.trackInteraction('click', 'submit-button');
  * 
  * // Track questions
- * tracker.startQuestion('q1', 'multiple-choice');
- * tracker.answerQuestion('q1', 'answer-A', 'answer-A', true, 1, 1);
+ * tracker.startQuestion('q1', 'multiple-choice', 'What is the capital of France?');
+ * tracker.answerQuestion('q1', 'Paris', 'Paris', true, 1, 1);
  * 
  * // Complete the session
  * tracker.complete(score, maxScore);
@@ -173,6 +173,13 @@ import type {
       const timeToAnswer = this.state.currentQuestionId === questionId && this.state.currentQuestionStartTime
         ? Date.now() - this.state.currentQuestionStartTime
         : undefined;
+
+      // Carry forward questionText from the matching started event if not explicitly provided
+      const startedEvents = this.state.questions.filter(
+        (q: QuestionEvent) => q.questionId === questionId && q.eventType === 'started'
+      );
+      const startedEvent = startedEvents[startedEvents.length - 1];
+      const resolvedQuestionText = options?.questionText ?? startedEvent?.questionText;
       
       const event: QuestionEvent = {
         type: 'BLOCK_QUESTION',
@@ -180,8 +187,8 @@ import type {
         blockId: this.config.blockId,
         sessionId: this.state.sessionId,
         questionId,
-        questionType: options?.questionType || 'multiple-choice',
-        questionText: options?.questionText,
+        questionType: options?.questionType || startedEvent?.questionType || 'multiple-choice',
+        questionText: resolvedQuestionText,
         timestamp: Date.now(),
         timeToAnswer,
         answer,
@@ -467,7 +474,7 @@ import type {
       // Send via postMessage (for iframe communication)
       try {
         window.postMessage(event, '*');
-        window.parent.postMessage(event, '*');
+        window.top.postMessage(event, '*');
       } catch (error) {
         console.warn('[BlockTracker] Failed to send postMessage:', error);
       }
