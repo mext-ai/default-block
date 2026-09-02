@@ -9,6 +9,7 @@
     "@react-three/drei": "^10.0.5",
     "@react-three/fiber": "^9.1.0",
     "@react-three/postprocessing": "^3.0.4",
+    "postprocessing": "^6.36.4",
     "lucide-react": "^0.559.0",
     "peerjs": "^1.5.5",
     "react": "^19.0.0",
