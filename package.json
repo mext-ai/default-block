@@ -5,6 +5,9 @@
     "preview": "vite preview",
     "build:dev": "vite build"
   },
+  "mexty": {
+    "profile": "default"
+  },
   "dependencies": {
     "@react-three/drei": "^10.0.5",
     "@react-three/fiber": "^9.1.0",
