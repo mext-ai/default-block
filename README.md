@@ -1,16 +1,12 @@
-# Mexty engine — game host template
+# Mexty engine — primitive template
 
-A block whose props are a game definition, rendered by [`@mexty/engine`](https://github.com/mext-ai/engine).
+A block that a game host can mount inside its scene through Module Federation.
 
-- `src/block.tsx` — `export const Block` mounts `GameHost` with the definition, the tracker and the
-  federation loader for remote primitives.
-- `src/props.schema.json` — the definition's JSON Schema, committed so the platform stores it as the
-  block's props schema (no LLM inference).
-- `src/engine/federation.ts` — loads primitive blocks into this bundle's share scope and resolves
-  them through `GET /api/engine/primitives/resolve`.
-- `package.json` → `"mexty": { "profile": "engine", "role": "game-host" }` selects the platform's
-  engine build profile (shared 3D stack, `./Block` + `./Component` exposes).
+- `src/primitive.tsx` — the primitive (default export) and its `manifest`; exposed as `./Primitive`.
+- `src/manifest.json` — kind, props schema, states, events; the platform stores `propsSchema` as the
+  block's props schema and the manifest on `Block.engine`.
+- `src/block.tsx` — a standalone preview (`./Block` / `./Component`) so the primitive is still a
+  normal, previewable store block.
+- `package.json` → `"mexty": { "profile": "engine", "role": "primitive" }`.
 
-Develop locally with `npm install && npm run dev` (mounts the chest demo definition).
-The platform build never executes `webpack.config.js`; it mirrors the platform's engine profile
-for a local `npm run build`.
+Reference it from a game definition: `"primitives": { "Chest": { "blockId": "<this block id>" } }`.

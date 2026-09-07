@@ -1,7 +1,11 @@
 {
-  "name": "mexty-engine-game",
+  "name": "mexty-engine-primitive",
   "private": true,
-  "mexty": { "profile": "engine", "role": "game-host", "engine": "0" },
+  "mexty": {
+    "profile": "engine",
+    "role": "primitive",
+    "engine": "0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "webpack --config webpack.config.js --mode production",

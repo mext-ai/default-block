@@ -1,0 +1,22 @@
+{
+  "kind": "prop",
+  "name": "Chest",
+  "version": "0.1.0",
+  "engine": "^0.1",
+  "propsSchema": {
+    "type": "object",
+    "x-media-parsed": true,
+    "properties": {
+      "prompt": { "type": "string", "description": "Verb shown in the interact prompt: \"Press E to <prompt>\"", "default": "open the chest" },
+      "radius": { "type": "number", "description": "Distance from the player at which the chest can be opened", "default": 2.5 },
+      "color": { "type": "string", "description": "Wood colour (CSS)", "default": "#8b5a2b" },
+      "trimColor": { "type": "string", "description": "Metal trim colour (CSS)", "default": "#d4af37" },
+      "size": { "type": "number", "description": "Uniform scale of the chest", "default": 1 }
+    }
+  },
+  "states": ["closed", "open"],
+  "actions": [],
+  "emits": ["entity:interact"],
+  "listens": [],
+  "colliders": "none"
+}

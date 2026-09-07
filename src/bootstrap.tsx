@@ -1,8 +1,5 @@
-import { chestDemoDefinition } from "@mexty/engine-schema";
 import { mount } from "./App";
 
-// Local development (`npm run dev`) and standalone exports mount into #root
-// with the demo definition. The platform mounts through the federation
-// container instead, passing the saved props as the definition.
+// Local development and standalone exports: mount the primitive's preview.
 const container = document.getElementById("root");
-if (container) mount(container, chestDemoDefinition);
+if (container) mount(container, {});

@@ -6,7 +6,8 @@ const { ModuleFederationPlugin } = require('webpack').container;
 // rendered from the block's build profile — `"mexty": { "profile": "engine" }`
 // in package.json. This mirrors that engine profile: the 3D stack and the
 // engine are shared singletons (non-eager, hence the async bootstrap entry),
-// `./Block` exposes the mount API, `./Component` the Block component.
+// `./Block` exposes the mount API, `./Component` the Block component, and
+// `./Primitive` the primitive a game host mounts for an entity.
 const singleton = (requiredVersion) => ({ singleton: true, eager: false, strictVersion: false, requiredVersion });
 
 module.exports = {
@@ -26,7 +27,7 @@ module.exports = {
       name: 'block_local',
       library: { type: 'var', name: 'block_local' },
       filename: 'remoteEntry.js',
-      exposes: { './Block': './src/App', './Component': './src/block' },
+      exposes: { './Block': './src/App', './Component': './src/block', './Primitive': './src/primitive' },
       shared: {
         react: singleton('^19.2.7'),
         'react-dom': singleton('^19.2.7'),
