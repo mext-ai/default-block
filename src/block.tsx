@@ -2,7 +2,7 @@ import React from "react";
 import { GameHost } from "@mexty/engine";
 import type { GameDefinition } from "@mexty/engine-schema";
 import BlockTracker from "./utils/blockTracker";
-import { loadRemote, resolvePrimitive } from "./engine/federation";
+import { loadRemote, resolveAssets, resolvePrimitive } from "./engine/federation";
 
 /**
  * A Mexty game.
@@ -23,6 +23,7 @@ export const Block: React.FC<BlockProps> = (props) => (
     tracker={tracker}
     loadRemote={loadRemote}
     resolvePrimitive={resolvePrimitive}
+    resolveAssets={resolveAssets}
     style={{ width: "100vw", height: "100vh" }}
   />
 );

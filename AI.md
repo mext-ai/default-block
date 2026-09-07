@@ -7,6 +7,11 @@ This block is a **game host**: its code is structure, its props are the game.
   so never delete or hand-edit it. Regenerate it when you upgrade `@mexty/engine-schema`.
 - To change the game — assets, characters, quests, triggers, texts — **save a new props variant**
   (`save_block_props`). Do not hardcode content in code.
+- Assets: an entry in `assets` takes either a direct file URL or a **catalog reference**,
+  `"ref": "asset:<id>"`. Prefer the catalog (`list_engine_assets`, or the picker in the props
+  editor): the catalog carries the model's scale, whether it is rigged and its clip names, so a
+  definition can say `clips: { walk: … }` only when it needs to override them. A `scale` or `clips`
+  written in the definition always wins over the catalog.
 - To add behaviour, prefer a **primitive block** (template `engine-primitive`) referenced from
   `primitives` as `{ "blockId": "<id>" }`. Primitives bundled here can be registered on `GameHost`
   as `localPrimitives` and referenced as `{ "local": "<name>" }`.

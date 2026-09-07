@@ -1,4 +1,4 @@
-import { createWebpackRemoteLoader, type RemoteEntryInfo } from "@mexty/engine";
+import { createCatalogAssetResolver, createWebpackRemoteLoader, type RemoteEntryInfo } from "@mexty/engine";
 
 // Webpack runtime globals — present in the platform build, absent in `vite dev`.
 declare const __webpack_init_sharing__: ((scope: string) => Promise<void>) | undefined;
@@ -41,3 +41,13 @@ export function resolvePrimitive(blockId: string): Promise<RemoteEntryInfo | nul
   }
   return p;
 }
+
+/**
+ * Answers the `asset:<id>` references a definition carries.
+ *
+ * An asset picked from the catalog is stored as a reference, not a URL, so the
+ * game reads the file, its scale, its rig and its clip names from the catalog
+ * at run time — correcting a shared asset fixes every game using it. A plain
+ * URL in the same field still works and needs none of this.
+ */
+export const resolveAssets = createCatalogAssetResolver({ apiBase: apiBaseUrl() });
