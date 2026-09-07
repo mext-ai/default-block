@@ -3,6 +3,7 @@ import { GameHost } from "@mexty/engine";
 import type { GameDefinition } from "@mexty/engine-schema";
 import BlockTracker from "./utils/blockTracker";
 import Chest from "./primitive";
+import { resolveAssets } from "./engine/catalog";
 
 /**
  * A primitive block is still a normal block in the store, so its props are a
@@ -77,6 +78,7 @@ export const Block: React.FC<BlockProps> = (props) => (
     definition={hasDefinition(props) ? props : defaultPreview}
     tracker={tracker}
     localPrimitives={{ Chest }}
+    resolveAssets={resolveAssets}
     style={{ width: "100vw", height: "100vh" }}
   />
 );

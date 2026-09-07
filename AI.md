@@ -15,6 +15,10 @@ entity whose `primitives` alias points at this block (`{ "blockId": "<this block
 - `src/manifest.json` declares what a game host needs to know: kind, the schema of `entity.props`
   for this primitive, states, emitted/listened events. The platform records it on the block after
   each build and serves it to hosts. Keep it in step with `src/primitive.tsx`.
+- Assets: `useAsset(entity.asset)` resolves whatever the definition points at — a direct file URL,
+  or a catalog reference (`asset:<id>`) the host has already fetched. It answers with the model's
+  url, its scale and its semantic clip names, and `null` while a catalog asset is still resolving,
+  which is a placeholder, not an error.
 - **Props are a game definition.** Like a game host, this block's props (`src/props.schema.json`,
   generated from `@mexty/engine-schema`, committed on purpose — never delete or hand-edit it) are a
   whole game: the store preview is a small game with this primitive in it, referenced as

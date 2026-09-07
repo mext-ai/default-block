@@ -146,6 +146,15 @@
         "x-asset": {
           "kindPath": "kind",
           "refPath": "ref"
+        },
+        "x-media": {
+          "kind": "model|image|audio",
+          "urlPath": "ref",
+          "catalog": {
+            "type": "engineAssets",
+            "kindPath": "kind",
+            "refPrefix": "asset:"
+          }
         }
       }
     },
