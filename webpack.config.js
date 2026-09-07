@@ -2,73 +2,48 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { ModuleFederationPlugin } = require('webpack').container;
 
-// Local build only. When the platform builds a block it replaces this file with
-// its own config (backend services/blocks/buildSecurity.ts), rendered from the
-// block's build profile: the container name becomes `block_<blockId>`, `./Block`
-// and `./Component` are exposed, and React is a shared singleton. This file
-// mirrors that contract so `npm run build` on your machine yields the same shape.
+// Local build only. The platform replaces this file with its own config,
+// rendered from the block's build profile — `"mexty": { "profile": "engine" }`
+// in package.json. This mirrors that engine profile: the 3D stack and the
+// engine are shared singletons (non-eager, hence the async bootstrap entry),
+// `./Block` exposes the mount API, `./Component` the Block component.
+const singleton = (requiredVersion) => ({ singleton: true, eager: false, strictVersion: false, requiredVersion });
+
 module.exports = {
   mode: 'production',
   entry: './src/index.tsx',
   devtool: 'source-map',
-  devServer: {
-    port: 3001,
-    open: true,
-    hot: true,
-  },
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js', '.jsx'],
-  },
+  resolve: { extensions: ['.tsx', '.ts', '.js', '.jsx', '.json'] },
   module: {
     rules: [
-      {
-        test: /\.(tsx?|jsx?)$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
-      },
-      {
-        test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
-      },
+      { test: /\.(tsx?|jsx?)$/, use: { loader: 'ts-loader', options: { transpileOnly: true } }, exclude: /node_modules/ },
+      { test: /\.css$/i, use: ['style-loader', 'css-loader'] },
     ],
   },
   plugins: [
-    new HtmlWebpackPlugin({
-      template: './index.html',
-    }),
+    new HtmlWebpackPlugin({ template: './index.html' }),
     new ModuleFederationPlugin({
-      // Replaced by the platform with `block_<blockId>`. The library lives on
-      // the plugin, not on `output`, so only the container entry assigns the
-      // global (an `output.library` would make bundle.js overwrite it).
       name: 'block_local',
       library: { type: 'var', name: 'block_local' },
       filename: 'remoteEntry.js',
-      exposes: {
-        // mount(container, props) — the API every Mexty host calls. Required.
-        './Block': './src/App',
-        // The Block component itself, for hosts that share React (e.g. a game
-        // host rendering this block in-world).
-        './Component': './src/block',
-      },
-      // React is a shared singleton: a host running React 19 renders this
-      // block's component inline; loaded alone the block uses its own bundled
-      // copy. `eager` keeps the synchronous entry in src/index.tsx working.
+      exposes: { './Block': './src/App', './Component': './src/block' },
       shared: {
-        react: { singleton: true, eager: true, requiredVersion: '^19.0.0', strictVersion: false },
-        'react-dom': { singleton: true, eager: true, requiredVersion: '^19.0.0', strictVersion: false },
+        react: singleton('^19.2.7'),
+        'react-dom': singleton('^19.2.7'),
+        three: singleton('^0.184.0'),
+        '@react-three/fiber': singleton('^9.4.0'),
+        '@react-three/drei': singleton('^10.7.0'),
+        '@react-three/rapier': singleton('^2.2.0'),
+        zustand: singleton('^5.0.0'),
+        '@mexty/engine': singleton('^0.1.0'),
       },
     }),
   ],
-  externals: {},
-  optimization: {
-    splitChunks: false,
-    concatenateModules: true,
-  },
+  optimization: { splitChunks: false, concatenateModules: true },
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
     clean: true,
-    // One chunk-loading global per block, so several blocks can share a page.
     uniqueName: 'block_local',
     publicPath: 'auto',
   },

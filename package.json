@@ -1,37 +1,36 @@
 {
+  "name": "mexty-engine-game",
+  "private": true,
+  "mexty": { "profile": "engine", "role": "game-host", "engine": "0" },
   "scripts": {
     "dev": "vite",
     "build": "webpack --config webpack.config.js --mode production",
-    "preview": "vite preview",
-    "build:dev": "vite build"
-  },
-  "mexty": {
-    "profile": "default"
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@react-three/drei": "^10.0.5",
-    "@react-three/fiber": "^9.1.0",
-    "@react-three/postprocessing": "^3.0.4",
-    "postprocessing": "^6.36.4",
-    "lucide-react": "^0.559.0",
-    "peerjs": "^1.5.5",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "three": "^0.174.0",
-    "zustand": "^5.0.8"
+    "@mexty/engine": "^0.1.0",
+    "@mexty/engine-schema": "^0.1.0",
+    "@react-three/drei": "^10.7.8",
+    "@react-three/fiber": "^9.7.0",
+    "@react-three/rapier": "^2.2.0",
+    "ecctrl": "^2.0.2",
+    "leva": "^0.10.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "three": "^0.185.1",
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
-    "@types/react": "^19.0.8",
-    "@types/react-dom": "^19.0.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.185.4",
     "@vitejs/plugin-react": "^4.3.4",
     "css-loader": "^6.8.0",
     "html-webpack-plugin": "^5.5.0",
     "style-loader": "^3.3.0",
-    "ts-loader": "^9.4.0",
-    "typescript": "^5.0.0",
+    "typescript": "^5.9.3",
     "vite": "^6.0.7",
     "webpack": "^5.88.0",
-    "webpack-cli": "^5.1.0",
-    "webpack-dev-server": "^4.15.0"
+    "webpack-cli": "^5.1.0"
   }
 }

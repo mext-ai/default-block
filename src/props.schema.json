@@ -1,0 +1,1632 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "type": "string"
+        },
+        "language": {
+          "default": "en",
+          "type": "string"
+        }
+      },
+      "required": [
+        "title"
+      ]
+    },
+    "settings": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "physics": {
+          "default": "rapier",
+          "type": "string",
+          "enum": [
+            "rapier",
+            "none"
+          ]
+        },
+        "gravity": {
+          "default": -9.81,
+          "type": "number"
+        },
+        "skybox": {
+          "x-alias-ref": {
+            "of": "assets",
+            "kind": "skybox"
+          },
+          "type": "string"
+        },
+        "environment": {
+          "description": "drei environment preset name (sunset, city, forest, …)",
+          "type": "string"
+        },
+        "background": {
+          "description": "CSS colour behind the scene",
+          "type": "string"
+        },
+        "ambientLight": {
+          "default": 0.6,
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "assets": {
+      "default": {},
+      "description": "Alias → asset. Swap a character by changing one entry.",
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "character",
+              "prop",
+              "building",
+              "terrain",
+              "weapon",
+              "projectile",
+              "texture",
+              "material",
+              "sound",
+              "animation",
+              "skybox"
+            ]
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Catalog reference `asset:<id>`, or a direct URL to the file (.glb, .png, .mp3, .hdr…)"
+          },
+          "scale": {
+            "description": "Uniform scale applied to the loaded model",
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "clips": {
+            "description": "Semantic clip → clip name inside the file, e.g. { idle: 'Survey', walk: 'Walk' }",
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "enum": [
+                "idle",
+                "walk",
+                "run",
+                "jump",
+                "fall",
+                "land",
+                "attack",
+                "hurt",
+                "die",
+                "open",
+                "close",
+                "talk",
+                "climb",
+                "dive",
+                "turn",
+                "shoot",
+                "slash"
+              ]
+            },
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "forwardAxis": {
+            "description": "Which local axis the model faces",
+            "type": "string",
+            "enum": [
+              "+z",
+              "-z",
+              "+x",
+              "-x"
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "ref"
+        ],
+        "x-asset": {
+          "kindPath": "kind",
+          "refPath": "ref"
+        }
+      }
+    },
+    "primitives": {
+      "default": {},
+      "description": "Alias → primitive (builtin, store block or any block's component)",
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "builtin": {
+                "type": "string",
+                "enum": [
+                  "character",
+                  "interactable",
+                  "trigger-volume",
+                  "ground",
+                  "sky",
+                  "light"
+                ]
+              }
+            },
+            "required": [
+              "builtin"
+            ],
+            "description": "A primitive shipped with @mexty/engine"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "blockId": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{24}$"
+              }
+            },
+            "required": [
+              "blockId"
+            ],
+            "description": "A primitive block from the store, loaded through Module Federation"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "componentBlockId": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{24}$"
+              }
+            },
+            "required": [
+              "componentBlockId"
+            ],
+            "description": "Any block's ./Component, rendered in-world on a panel"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "local": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "local"
+            ],
+            "description": "A primitive bundled with this game host (its own code), by name"
+          }
+        ],
+        "x-primitive": {
+          "kinds": [
+            "*"
+          ]
+        }
+      }
+    },
+    "player": {
+      "type": "object",
+      "properties": {
+        "entityId": {
+          "type": "string",
+          "minLength": 1,
+          "x-entity-ref": {}
+        },
+        "camera": {
+          "default": "third-person",
+          "type": "string",
+          "enum": [
+            "third-person",
+            "first-person",
+            "top-down",
+            "side-scroller"
+          ]
+        },
+        "speed": {
+          "default": 4,
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "sprintMultiplier": {
+          "default": 1.8,
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "jumpHeight": {
+          "default": 1,
+          "type": "number",
+          "minimum": 0
+        },
+        "spawn": {
+          "minItems": 3,
+          "maxItems": 3,
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "[x, y, z]"
+        },
+        "interactKey": {
+          "default": "KeyE",
+          "type": "string"
+        }
+      },
+      "required": [
+        "entityId"
+      ]
+    },
+    "scene": {
+      "type": "object",
+      "properties": {
+        "entities": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]+$"
+              },
+              "primitive": {
+                "type": "string",
+                "minLength": 1,
+                "x-alias-ref": {
+                  "of": "primitives"
+                }
+              },
+              "asset": {
+                "x-alias-ref": {
+                  "of": "assets"
+                },
+                "type": "string",
+                "minLength": 1
+              },
+              "transform": {
+                "type": "object",
+                "properties": {
+                  "position": {
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "description": "[x, y, z]"
+                  },
+                  "rotation": {
+                    "description": "Euler angles in radians",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    }
+                  },
+                  "scale": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      {
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "description": "[x, y, z]"
+                      }
+                    ]
+                  }
+                }
+              },
+              "state": {
+                "description": "Initial named state, e.g. 'closed'",
+                "type": "string"
+              },
+              "tags": {
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "enabled": {
+                "default": true,
+                "type": "boolean"
+              },
+              "props": {
+                "default": {},
+                "description": "Primitive-specific props",
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "$ref": "#/definitions/__schema0"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "primitive"
+            ]
+          }
+        }
+      },
+      "required": [
+        "entities"
+      ]
+    },
+    "quests": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "type": "string"
+          },
+          "order": {
+            "default": "sequential",
+            "type": "string",
+            "enum": [
+              "sequential",
+              "parallel"
+            ]
+          },
+          "autoStart": {
+            "default": false,
+            "type": "boolean"
+          },
+          "objectives": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "reach",
+                    "collect",
+                    "talk",
+                    "destroy",
+                    "interact",
+                    "answer",
+                    "custom"
+                  ]
+                },
+                "target": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "tag": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": [
+                        "tag"
+                      ]
+                    }
+                  ],
+                  "x-entity-ref": {},
+                  "description": "reach/interact/destroy: entity id or { tag }; collect: item id; talk: dialogue id; answer: question id; custom: event name"
+                },
+                "count": {
+                  "default": 1,
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "text": {
+                  "type": "string",
+                  "description": "Objective text shown in the HUD"
+                },
+                "reward": {
+                  "type": "object",
+                  "properties": {
+                    "score": {
+                      "default": 0,
+                      "type": "number"
+                    }
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "type",
+                "target",
+                "text"
+              ]
+            }
+          },
+          "onStart": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/__schema1"
+            }
+          },
+          "onComplete": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/__schema1"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "objectives"
+        ]
+      }
+    },
+    "triggers": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "on": {
+            "type": "object",
+            "properties": {
+              "event": {
+                "type": "string",
+                "enum": [
+                  "game:started",
+                  "game:completed",
+                  "entity:spawned",
+                  "entity:destroyed",
+                  "entity:damaged",
+                  "entity:interact",
+                  "entity:stateChanged",
+                  "trigger:enter",
+                  "trigger:exit",
+                  "pickup:collected",
+                  "projectile:hit",
+                  "weapon:fired",
+                  "dialogue:started",
+                  "dialogue:choice",
+                  "dialogue:ended",
+                  "quest:started",
+                  "objective:progress",
+                  "objective:completed",
+                  "quest:completed",
+                  "quest:failed",
+                  "answer:submitted",
+                  "anim:ended",
+                  "custom"
+                ]
+              },
+              "source": {
+                "description": "Only fire for this entity (or entities with this tag)",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tag": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "tag"
+                    ]
+                  }
+                ],
+                "x-entity-ref": {}
+              },
+              "match": {
+                "description": "Payload fields that must equal these values",
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "$ref": "#/definitions/__schema4"
+                }
+              }
+            },
+            "required": [
+              "event"
+            ]
+          },
+          "if": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/__schema5"
+            }
+          },
+          "do": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/__schema1"
+            }
+          },
+          "once": {
+            "default": false,
+            "type": "boolean"
+          },
+          "cooldownMs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "id",
+          "on",
+          "do"
+        ]
+      }
+    },
+    "hud": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "objectives": {
+          "default": true,
+          "type": "boolean"
+        },
+        "score": {
+          "default": true,
+          "type": "boolean"
+        },
+        "interactPrompt": {
+          "default": true,
+          "type": "boolean"
+        },
+        "toastsPosition": {
+          "default": "top",
+          "type": "string",
+          "enum": [
+            "top",
+            "bottom"
+          ]
+        },
+        "controlsHint": {
+          "default": "",
+          "type": "string"
+        }
+      }
+    },
+    "completion": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "when": {
+          "default": "allQuests",
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "allQuests"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "quest": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "quest"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "score": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "score"
+              ]
+            }
+          ]
+        },
+        "passScore": {
+          "description": "Minimum score for success; omitted means completing is success",
+          "type": "number"
+        },
+        "successText": {
+          "default": "",
+          "type": "string"
+        },
+        "failText": {
+          "default": "",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "meta",
+    "player",
+    "scene"
+  ],
+  "x-engine": {
+    "schemaVersion": 1,
+    "role": "game-host"
+  },
+  "definitions": {
+    "__schema0": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/__schema0"
+          }
+        },
+        {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/definitions/__schema0"
+          }
+        }
+      ]
+    },
+    "__schema1": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "playAnimation"
+            },
+            "target": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "tag": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "tag"
+                  ]
+                }
+              ],
+              "x-entity-ref": {},
+              "description": "Entity id, \"self\", \"player\", or { tag } for every entity with that tag"
+            },
+            "clip": {
+              "type": "string",
+              "minLength": 1,
+              "x-animation": {
+                "assetFromTarget": true
+              },
+              "description": "Semantic clip (idle, walk, open…) or a clip name in the asset"
+            },
+            "loop": {
+              "type": "boolean"
+            },
+            "then": {
+              "description": "Actions run when the clip ends",
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/__schema1"
+              }
+            }
+          },
+          "required": [
+            "type",
+            "target",
+            "clip"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "setState"
+            },
+            "target": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "tag": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "tag"
+                  ]
+                }
+              ],
+              "x-entity-ref": {},
+              "description": "Entity id, \"self\", \"player\", or { tag } for every entity with that tag"
+            },
+            "state": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "type",
+            "target",
+            "state"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "destroy"
+            },
+            "target": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "tag": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "tag"
+                  ]
+                }
+              ],
+              "x-entity-ref": {},
+              "description": "Entity id, \"self\", \"player\", or { tag } for every entity with that tag"
+            }
+          },
+          "required": [
+            "type",
+            "target"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "damage"
+            },
+            "target": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "tag": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "tag"
+                  ]
+                }
+              ],
+              "x-entity-ref": {},
+              "description": "Entity id, \"self\", \"player\", or { tag } for every entity with that tag"
+            },
+            "amount": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "required": [
+            "type",
+            "target",
+            "amount"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "heal"
+            },
+            "target": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "tag": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "tag"
+                  ]
+                }
+              ],
+              "x-entity-ref": {},
+              "description": "Entity id, \"self\", \"player\", or { tag } for every entity with that tag"
+            },
+            "amount": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "required": [
+            "type",
+            "target",
+            "amount"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "giveItem"
+            },
+            "itemId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "count": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "type",
+            "itemId"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "removeItem"
+            },
+            "itemId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "count": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "type",
+            "itemId"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "addScore"
+            },
+            "amount": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "type",
+            "amount"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "startQuest"
+            },
+            "questId": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "type",
+            "questId"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "advanceObjective"
+            },
+            "questId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "objectiveId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "by": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "type",
+            "questId",
+            "objectiveId"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "completeQuest"
+            },
+            "questId": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "type",
+            "questId"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "teleport"
+            },
+            "target": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "tag": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "tag"
+                  ]
+                }
+              ],
+              "x-entity-ref": {},
+              "description": "Entity id, \"self\", \"player\", or { tag } for every entity with that tag"
+            },
+            "to": {
+              "minItems": 3,
+              "maxItems": 3,
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          },
+          "required": [
+            "type",
+            "target",
+            "to"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "enable"
+            },
+            "target": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "tag": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "tag"
+                  ]
+                }
+              ],
+              "x-entity-ref": {},
+              "description": "Entity id, \"self\", \"player\", or { tag } for every entity with that tag"
+            }
+          },
+          "required": [
+            "type",
+            "target"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "disable"
+            },
+            "target": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "tag": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "tag"
+                  ]
+                }
+              ],
+              "x-entity-ref": {},
+              "description": "Entity id, \"self\", \"player\", or { tag } for every entity with that tag"
+            }
+          },
+          "required": [
+            "type",
+            "target"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "toast"
+            },
+            "text": {
+              "type": "string"
+            },
+            "durationMs": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "type",
+            "text"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "setFlag"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "value": {
+              "$ref": "#/definitions/__schema2"
+            }
+          },
+          "required": [
+            "type",
+            "name",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "emit"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "payload": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/__schema3"
+                }
+              ]
+            }
+          },
+          "required": [
+            "type",
+            "name"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "startDialogue"
+            },
+            "dialogueId": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "type",
+            "dialogueId"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "completeGame"
+            }
+          },
+          "required": [
+            "type"
+          ]
+        }
+      ]
+    },
+    "__schema2": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/__schema2"
+          }
+        },
+        {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/definitions/__schema2"
+          }
+        }
+      ]
+    },
+    "__schema3": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/__schema3"
+          }
+        },
+        {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/definitions/__schema3"
+          }
+        }
+      ]
+    },
+    "__schema4": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/__schema4"
+          }
+        },
+        {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/definitions/__schema4"
+          }
+        }
+      ]
+    },
+    "__schema5": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "hasItem": {
+              "type": "object",
+              "properties": {
+                "itemId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "count": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "itemId"
+              ]
+            }
+          },
+          "required": [
+            "hasItem"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "questActive": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "questActive"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "questCompleted": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "questCompleted"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "objectiveCompleted": {
+              "type": "object",
+              "properties": {
+                "questId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "objectiveId": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "questId",
+                "objectiveId"
+              ]
+            }
+          },
+          "required": [
+            "objectiveCompleted"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "entityState": {
+              "type": "object",
+              "properties": {
+                "target": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "tag": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": [
+                        "tag"
+                      ]
+                    }
+                  ],
+                  "x-entity-ref": {},
+                  "description": "Entity id, \"self\", \"player\", or { tag } for every entity with that tag"
+                },
+                "state": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "target",
+                "state"
+              ]
+            }
+          },
+          "required": [
+            "entityState"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "flag": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "equals": {
+                  "$ref": "#/definitions/__schema6"
+                }
+              },
+              "required": [
+                "name",
+                "equals"
+              ]
+            }
+          },
+          "required": [
+            "flag"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "healthBelow": {
+              "type": "object",
+              "properties": {
+                "target": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "tag": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": [
+                        "tag"
+                      ]
+                    }
+                  ],
+                  "x-entity-ref": {},
+                  "description": "Entity id, \"self\", \"player\", or { tag } for every entity with that tag"
+                },
+                "value": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "target",
+                "value"
+              ]
+            }
+          },
+          "required": [
+            "healthBelow"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "not": {
+              "$ref": "#/definitions/__schema5"
+            }
+          },
+          "required": [
+            "not"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "all": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/__schema5"
+              }
+            }
+          },
+          "required": [
+            "all"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "any": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/__schema5"
+              }
+            }
+          },
+          "required": [
+            "any"
+          ]
+        }
+      ]
+    },
+    "__schema6": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/__schema6"
+          }
+        },
+        {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/definitions/__schema6"
+          }
+        }
+      ]
+    }
+  },
+  "title": "Mexty game definition",
+  "x-media-parsed": true
+}
