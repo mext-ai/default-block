@@ -5,15 +5,20 @@ import BlockTracker from "./utils/blockTracker";
 import Chest from "./primitive";
 
 /**
- * Standalone preview of the primitive, so it is still a normal block in the
- * store: a tiny game with one of these chests in it. A game host never uses
- * this; it mounts `./Primitive` for its own entities.
+ * A primitive block is still a normal block in the store, so its props are a
+ * game definition like a game host's (see src/props.schema.json) — a small game
+ * rendered around the primitive, which the definition references as
+ * `{ "local": "Chest" }`. Save a variant to change that preview; without one
+ * the default below plays. A game host never uses this file: it mounts the
+ * `./Primitive` export for its own entities, with the props declared in
+ * src/manifest.json.
  */
-type BlockProps = { prompt?: string; radius?: number; color?: string; trimColor?: string; size?: number };
+type BlockProps = Partial<GameDefinition>;
 
 const tracker = new BlockTracker();
 
-const previewDefinition = (props: BlockProps): GameDefinition => ({
+/** The preview played when no props variant is saved. */
+export const defaultPreview: GameDefinition = {
   schemaVersion: 1,
   meta: { title: "Chest preview", description: "Walk up to the chest and press E." },
   settings: { physics: "rapier", background: "#0b1020", ambientLight: 0.7 },
@@ -32,7 +37,13 @@ const previewDefinition = (props: BlockProps): GameDefinition => ({
       { id: "sun", primitive: "Sun", transform: { position: [8, 12, 6] } },
       { id: "ground", primitive: "Ground", props: { size: 40, color: "#3b7a3b" } },
       { id: "hero", primitive: "Character", tags: ["player"] },
-      { id: "chest", primitive: "Chest", transform: { position: [0, 0, -4], rotation: [0, 0.3, 0] }, state: "closed", props: { ...props } },
+      {
+        id: "chest",
+        primitive: "Chest",
+        transform: { position: [0, 0, -4], rotation: [0, 0.3, 0] },
+        state: "closed",
+        props: { prompt: "open the chest", radius: 2.5, color: "#8b5a2b", trimColor: "#d4af37", size: 1 },
+      },
     ],
   },
   quests: [
@@ -57,8 +68,15 @@ const previewDefinition = (props: BlockProps): GameDefinition => ({
   ],
   hud: { objectives: true, score: false, interactPrompt: true, controlsHint: "WASD to move · E to interact" },
   completion: { when: "allQuests", successText: "It opens!" },
-});
+};
+
+const hasDefinition = (props: BlockProps) => Boolean(props && Object.keys(props).length > 0);
 
 export const Block: React.FC<BlockProps> = (props) => (
-  <GameHost definition={previewDefinition(props)} tracker={tracker} localPrimitives={{ Chest }} style={{ width: "100vw", height: "100vh" }} />
+  <GameHost
+    definition={hasDefinition(props) ? props : defaultPreview}
+    tracker={tracker}
+    localPrimitives={{ Chest }}
+    style={{ width: "100vw", height: "100vh" }}
+  />
 );
