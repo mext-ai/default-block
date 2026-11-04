@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, useGLTF, useAnimations, Environment, Text, Html } from "@react-three/drei";
+import { OrbitControls, useGLTF, useAnimations, Environment, Text } from "@react-three/drei";
 import { EffectComposer, Bloom, LUT } from "@react-three/postprocessing";
 import * as THREE from "three";
 
@@ -82,14 +82,6 @@ function Scene({ autoRotate = true, playAnimations = true }: { autoRotate: boole
   );
 }
 
-function LoadingSpinner() {
-  return (
-    <div className="flex items-center justify-center h-full">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-    </div>
-  );
-}
-
 export const Block: React.FC<BlockProps> = ({ 
   autoRotate = true,
   playAnimations = true,
@@ -102,12 +94,10 @@ export const Block: React.FC<BlockProps> = ({
         gl={{ antialias: true, alpha: true }}
         className="w-full h-full"
       >
-        <Suspense fallback={
-          <Html center>
-            <LoadingSpinner />
-          </Html>
-        }>
-          <Scene 
+        {/* No drei <Html> fallback: it unmounts a nested ReactDOM root inside
+            R3F's commit, which under React 19 throws NotFoundError in removeChild. */}
+        <Suspense fallback={null}>
+          <Scene
             autoRotate={autoRotate}
             playAnimations={playAnimations}
           />
